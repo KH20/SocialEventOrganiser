@@ -18,4 +18,10 @@ View other attendees
 
 Create teams, and join teams.
 
+REST API 
+
+---
+
+Unit, Integration and Functional Testing
+
 Created as part of a Software Engineering MSc at Cardiff University
