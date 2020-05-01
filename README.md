@@ -17,3 +17,5 @@ Change their attendance status
 View other attendees
 
 Create teams, and join teams.
+
+Created as part of a Software Engineering MSc at Cardiff University
