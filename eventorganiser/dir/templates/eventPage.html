@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Page</title>
+
+  <!-- favicon  -->
+  <link rel="icon" type="image/png" href="./media/favicon.png">
+
+  <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">-->
+
+  <link rel="stylesheet" media="all" href="./css/header_footer.css">
+  <link rel="stylesheet" href="./css/bootstrap/css/bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="./css/eventPage.css">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</head>
+<body class="bg-light">
+
+<header th:replace="fragments/headerTemplate :: header"></header>
+<iframe id="popUpBox" src="/eventPagePopUp" style="display:none;visibility:hidden;" onload="this.style.visibility='visible';"></iframe>
+<div id="eventBoxOuter" class="bg-light">
+
+  <div id="eventBoxInner">
+    <div id="attendeesDiv" class="popUpBox">
+      <div id="attendeesClose" class="close">X</div>
+      <div class="popUpWrapper">
+        <h3>Attendees</h3>
+        <div>
+          <div class="attendees" th:each="attendee:${attendees}" th:text="${attendee.getFirstName()} + ' ' + ${attendee.getLastName()}"></div>
+        </div>
+      </div>
+    </div>
+    <div id="teammatesDiv" class="popUpBox">
+      <div id="teammatesClose" class="close">X</div>
+      <div class="popUpWrapper">
+        <h3>Teammates</h3>
+        <div>
+          <div class="teammates" th:each="teammate:${teammates}" th:text="${teammate.getFirstName()} + ' ' + ${teammate.getLastName()}"></div>
+        </div>
+      </div>
+    </div>
+    <div id="changeTeamDiv" class="popUpBox">
+      <div id="changeTeamClose" class="close">X</div>
+      <div class="popUpWrapper">
+        <h3>Change/Join<br>Team</h3>
+        <div>
+            <select th:id="teamsDropdown" name="team">
+              <option value="" selected disabled>Choose Team</option>
+              <option th:each="team: ${teams}" th:value="${team.getTeamId()}" th:text="${team.getTeamName()}"></option>
+            </select>
+            <div>
+              <input id="teamChangeSubmit" type="submit" value="Submit">
+            </div>
+        </div>
+      </div>
+    </div>
+    <div id="createTeamDiv" class="popUpBox">
+      <div id="createTeamClose" class="close">X</div>
+      <div class="popUpWrapper">
+        <h3>Create Team</h3>
+        <div>
+            <input id="teamName" type="text">
+            <input id="teamCreateSubmit" type="submit" value="Submit">
+        </div>
+      </div>
+    </div>
+
+
+    <div class="infoBox1">
+
+      <div class="eventTitleBox">
+        <div class="eventTitleBoxInner">
+          <h1 id="eventTitle" th:text="${event.getTitle()}"></h1>
+          <div class="isTeamEventBoxOuter">
+            <div class="isTeamEventBoxInner">
+              <p id="isTeamEvent" th:if="${event.getMaxTeamSize() > 0}" >
+                Team Event
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eventTimeBox">
+        <div class="eventTimeBoxInner">
+          <div class="eventStartTimeBox">
+
+            <div class="eventStartTimeBoxInner1">
+              <div class="eventFromBox">
+                <p>Start</p>
+              </div>
+              <hr class="timeLines">
+              <p id="eventStartTime" th:text="${event.getEventStartTime()}"></p>
+            </div>
+
+            <div class="eventStartTimeBoxInner2">
+              <div class="eventEndBox">
+                <p>End</p>
+              </div>
+              <hr class="timeLines">
+              <p id="eventEndTime" th:text="${event.getEventEndTime()}"></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="infoBox2">
+      <div id="eventDetailsBox" class="eventDetailsBox">
+        <div class="eventDetailsBoxInner">
+          <div class="attendanceFormBox">
+            <div class="attendanceFormBoxInner">
+              <div id="attendanceForm">
+                <a th:href="@{/post/attendance(attendanceId=(${attendanceRecord != null ? attendanceRecord.getAttendanceId() : -1}),attendanceResponse=(${1}), eventId=(${event.getId()}))}">
+                  <input id="AB1" class="attendanceButtons" th:classappend="${attendanceRecord != null && attendanceRecord.getResponse() == 1} ?'SELECTED':''" type="submit" name="Going" value="Going"></a>
+                <a th:href="@{/post/attendance(attendanceId=(${attendanceRecord != null ? attendanceRecord.getAttendanceId() : -1}),attendanceResponse=(${2}), eventId=(${event.getId()}))}">
+                  <input id="AB2" class="attendanceButtons" th:classappend="${attendanceRecord != null && attendanceRecord.getResponse() == 2} ?'SELECTED':''" type="submit" name="Not Going" value="Not Going"></a>
+                <a th:href="@{/post/attendance(attendanceId=(${attendanceRecord != null ? attendanceRecord.getAttendanceId() : -1}),attendanceResponse=(${3}), eventId=(${event.getId()}))}">
+                  <input id="AB3" class="attendanceButtons" th:classappend="${attendanceRecord != null && attendanceRecord.getResponse() == 3} ?'SELECTED':''" type="submit" name="Maybe" value="Maybe"></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="descLineBoxes">
+            <hr class="descLines">
+          </div>
+
+          <p id="eventDesc" th:text="${event.getDescription()}"></p>
+
+          <div class="descLineBoxes">
+            <hr class="descLines">
+          </div>
+          <p id="eventLocSt1" th:text="${event.getEventLocSt1()}"></p>
+          <p id="eventLocSt2" th:if="${event.getEventLocSt2() !=''}"><span th:text="${event.getEventLocSt2()}"></span></p>
+          <p id="eventLocCity" th:text="${event.getEventLocCity()}"></p>
+          <p id="eventLocPost" th:text="${event.getEventLocPost()}"></p>
+
+          <div id="eventAttendeesBox">
+            <div id="eventAttendeesBoxInner">
+              <input id="seeAttendeesButton" type="button" value="Attendees">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div id="eventLocBox" class="eventLocBox">
+        <div class="eventLocBoxInner">
+          <iframe id="mapIframe" th:src="@{'/mapPage' + ${mapDetails}}"></iframe>  <!-- https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2484.365792090846!2d-3.179233183904616!3d51.488154579631946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x486e1cc72c707061%3A0x2e7fee79f4d09cc1!2sCardiff%20University%20Students&#39;%20Union!5e0!3m2!1sen!2suk!4v1573639825206!5m2!1sen!2suk -->
+        </div>        <!-- @{'./templates/map_page.html' + ${mapQueryStr}} -->
+      </div>
+    </div>
+
+    <div class="teamEventBox" th:if="${event.getMaxTeamSize() > 0}" >
+
+      <div class="teamEventBoxInner">
+        <div class="teamEventTitleBox">
+          <p>Team</p>
+        </div>
+        <div class="teamLineBoxes">
+          <hr class="teamLines">
+        </div>
+        <p id="eventTeamName" th:text="${team != null ? team.getTeamName() : ''}"></p>
+        <div class="teamFormsBox">
+          <div class="teamFormBoxInner">
+            <div id="teamForm" onsubmit="return false">
+              <input class="teamButtons" id="seeTeammatesButton" type="submit" name="viewTeammates" value="Team Members">
+              <input class="teamButtons" id="seeChangeTeamButton" type="submit" name="changeTeam" value="Change Team">
+              <input class="teamButtons" id="seeCreateTeamButton" type="submit" name="createTeam" value="Create Team">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer th:replace="fragments/footerTemplate :: footer"></footer>
+
+<script async defer src="./js/header.js" ></script>
+<script async defer src="./js/jquery.js"></script>
+<script src="./js/eventPage.js"></script>
+<script th:inline="javascript">
+
+  //CHANGE TEAM CODE
+  var teamChangeSubmit = document.getElementById("teamChangeSubmit");
+  teamChangeSubmit.addEventListener("click", submitTeamChange);
+  var event = [[${event.id}]]
+  function submitTeamChange(){
+    var select = document.getElementById("teamsDropdown");
+    window.location.href="/post/event/team/update?eventId=" + event + "&teamId=" + select.value;
+  }
+  /////////////////////////
+
+  var teamCreateSubmit = document.getElementById("teamCreateSubmit");
+  teamCreateSubmit.addEventListener("click", submitNewTeam);
+  function submitNewTeam(){
+    var select = document.getElementById("teamName");
+    window.location.href="/post/event/team/new?eventId=" + event + "&teamName=" + select.value;
+  }
+
+</script>
+</body>
+</html>

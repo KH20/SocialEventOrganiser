@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <title>Feed</title>
+
+    <!-- favicon  -->
+    <link rel="icon" type="image/png" href="./media/favicon.png">
+
+    <!-- ## GOOGLE FONTS ## -->
+    <link href="./css/fonts.css" rel="stylesheet" type="text/css">
+
+    <!-- ## LOAD STYLSHEETS ## -->
+    <link rel="stylesheet" media="all" href="./css/header_footer.css">
+    <link rel="stylesheet" href="./css/bootstrap/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="./css/feedPage.css">
+    <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" type="text/css">
+
+
+</head>
+
+<body>
+<header th:replace="fragments/headerTemplate :: header"></header>
+
+    <div  id="feedPost" class="container d-flex justify-content-center">
+
+        <div class="row">
+            <div class="row-header">
+                <div class="d-flex justify-content-start" >
+                    <h1 id="feedHeading" class="text-muted">Events Feed</h1>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <!-- Search box -->
+                    <div class="form-inline md-form form-sm active-cyan-2" >
+                        <input class="form-control form-control-sm mr-3 w-75" name="search_value"  onkeyup="searchFunction()" type="text" placeholder="Search" aria-label="Search">
+                        <i class="fas fa-search" aria-hidden="true" onclick="searchFunction()"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-start">
+                    <input type="checkbox" id="toggle-state" checked data-toggle="toggle" data-on="All Events" data-off="My Events" data-onstyle="success" data-offstyle="danger">
+                </div>
+
+                <!-- In case of no matches   -->
+                <div class="d-flex justify-content-start eventNoMatches post-none-search">
+                    <h3 class="text-muted mt-3 eventNoMatchesText post-none-search">0 matches found</h3>
+                </div>
+            </div>
+
+
+            <!-- All Posts-->
+            <div class="card postEventsAll"  th:each="event, i:${allEvents}">
+
+                <div class="card-body" th:value="${i.index}">
+                    <div class="row" >
+                        <div class="col-8">
+                            <a th:href="@{/eventPage(eventId=${event.getId()})}">
+                                <h5 class="card-title" th:text=" ${event.getTitle()}"></h5>
+                            </a>
+                        </div>
+                        <div class="col-4">
+                            <i class="fa  fa-2x d-flex justify-content-end team-icon" th:text="${event.getMaxTeamSize()}"></i>
+                        </div>
+                    </div>
+
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <span th:text="${event.getEventStartDate()}"></span>,
+                            <span  name="startTimeEvent" th:text="${event.getEventStartTime()}"></span>
+                        </small>
+                    </p>
+
+                    <p class="card-text" th:text="${event.getDescription()}">
+
+                    <p class="card-text">
+                        <span th:text="${event.getEventLocSt1()}"></span>
+                        <span th:text="${event.getEventLocSt2()}"></span>,
+                        <span th:text="${event.getEventLocCity()}"></span>,
+                        <span th:text="${event.getEventLocPost()}"></span>
+                    </p>
+
+                    <div class="d-flex justify-content-center">
+
+                            <a th:href="@{/post/attendance(attendanceId=(${allAttendance.get(i.index) != null ? allAttendance.get(i.index).getAttendanceId() : -1}),attendanceResponse=(${1}), eventId=(${event.getId()}))}">
+                                <input th:classappend="${allAttendance.get(i.index).response == 1 && allAttendance.get(i.index).getEventId() == event.getId()}  ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick=""   name="Going" value="Going" th:id="${event.getTitle() +'_Going'}"></a>
+                            <a th:href="@{/post/attendance(attendanceId=(${allAttendance.get(i.index) != null ? allAttendance.get(i.index).getAttendanceId() : -1}),attendanceResponse=(${2}), eventId=(${event.getId()}))}">
+                                <input th:classappend="${allAttendance.get(i.index).response == 2 && allAttendance.get(i.index).getEventId() == event.getId()}  ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="" name="Not Going" value="Not Going" th:id="${event.getTitle() +'_notGoing'}"></a>
+                            <a th:href="@{/post/attendance(attendanceId=(${allAttendance.get(i.index) != null ? allAttendance.get(i.index).getAttendanceId() : -1}),attendanceResponse=(${3}), eventId=(${event.getId()}))}">
+                                <input th:classappend="${allAttendance.get(i.index).response == 3 && allAttendance.get(i.index).getEventId() == event.getId()}  ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick=""   name="Maybe" value="Maybe" th:id="${event.getTitle() +'_Maybe'}"></a>
+<!--                        <form action="" id="attendanceForm" th:name="${event.getId()}" onsubmit="return false">-->
+<!--                            <input   th:classappend="${ allAttendance.get(i.index).getResponse()} == 1 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${event.getId()}]],1, [[${allAttendance.get(i.index)}]], this)"   name="Going" value="Going">-->
+<!--                            <input   th:classappend="${ allAttendance.get(i.index).getResponse()} == 2 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${event.getId()}]],2, [[${allAttendance.get(i.index)}]], this)" name="Not Going" value="Not Going">-->
+<!--                            <input   th:classappend="${ allAttendance.get(i.index).getResponse()} == 3 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${event.getId()}]],3, [[${allAttendance.get(i.index)}]], this)"   name="Maybe" value="Maybe">-->
+<!--                        </form>-->
+                    </div>
+
+                </div>
+             </div>
+
+        <!-- Specific Posts        -->
+        <div class="card postEventsUsers post-none-toggle"  th:each="myEvent,i : ${myEvents}">
+
+            <div class="card-body"th:value="${i.index}">
+                <div class="row" >
+                    <div class="col-8">
+                        <a th:href="@{/eventPage(eventId=${myEvent.getId()})}">
+                            <h5 class="card-title" th:text=" ${myEvent.getTitle()}"></h5>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <i class="fa  fa-2x d-flex justify-content-end team-icon" th:text="${myEvent.getMaxTeamSize()}"></i>
+                    </div>
+                </div>
+
+                <p class="card-text">
+                    <small class="text-muted">
+                        <span th:text="${myEvent.getEventStartDate()}"></span>,
+                        <span  name="startTimeEvent" th:text="${myEvent.getEventStartTime()}"></span>
+                    </small>
+                </p>
+
+                <p class="card-text" th:text="${myEvent.getDescription()}">
+
+                <p class="card-text">
+                    <span th:text="${myEvent.getEventLocSt1()}"></span>
+                    <span th:text="${myEvent.getEventLocSt2()}"></span>,
+                    <span th:text="${myEvent.getEventLocCity()}"></span>,
+                    <span th:text="${myEvent.getEventLocPost()}"></span>
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <a th:href="@{/post/attendance(attendanceId=(${myAttendance.get(i.index).getAttendanceId()}),attendanceResponse=(${1}), eventId=(${myEvent.getId()}))}">
+                        <input th:classappend="${myAttendance.get(i.index).response == 1 && myAttendance.get(i.index).getEventId() == myEvent.getId()}  ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit" name="Going" value="Going" th:id="${myEvents.get(i.index).getTitle() +'_Going_'}"></a>
+                    <a th:href="@{/post/attendance(attendanceId=(${myAttendance.get(i.index).getAttendanceId()}),attendanceResponse=(${2}), eventId=(${myEvent.getId()}))}">
+                        <input th:classappend="${myAttendance.get(i.index).response == 2 && myAttendance.get(i.index).getEventId() == myEvent.getId()}  ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit" name="Not Going" value="Not Going" th:id="${myEvents.get(i.index).getTitle() +'_notGoing'}"></a>
+                    <a th:href="@{/post/attendance(attendanceId=(${myAttendance.get(i.index).getAttendanceId()}),attendanceResponse=(${3}), eventId=(${myEvent.getId()}))}">
+                        <input th:classappend="${myAttendance.get(i.index).response == 3 && myAttendance.get(i.index).getEventId() == myEvent.getId()} ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit" name="Maybe" value="Maybe" th:id="${myEvents.get(i.index).getTitle() +'_Maybe'}"></a>
+<!--                    <form action="" id="attendanceForm" th:name="${myEvent.getId()}" onsubmit="return false">-->
+<!--                        <input   th:classappend="${ myAttendance.get(i.index).getResponse()} == 1 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${myEvent.getId()}]],3, [[${myAttendance.get(i.index)}]], this)"   name="Going" value="Going">-->
+<!--                        <input   th:classappend="${ myAttendance.get(i.index).getResponse()} == 2 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${myEvent.getId()}]],3, [[${myAttendance.get(i.index)}]], this)" name="Not Going" value="Not Going">-->
+<!--                        <input   th:classappend="${ myAttendance.get(i.index).getResponse()} == 3 ? 'attendanceButtons-active' : 'attendanceButtons'" type="submit"  th:onclick="postAttendanceUpdateRecord([[${myEvent.getId()}]],3, [[${myAttendance.get(i.index)}]], this)"   name="Maybe" value="Maybe">-->
+<!--                    </form>-->
+            </div>
+        </div>
+        </div>
+
+    </div>
+
+
+<footer th:replace="fragments/footerTemplate :: footer"></footer>
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+<script src="./css/bootstrap/js/bootstrap.js" ></script>
+<script src="./js/header.js" ></script>
+<script src="./js/feedPage.js" ></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+
+
+
+
+</body>
+</html>

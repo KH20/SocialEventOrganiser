@@ -1,0 +1,26 @@
+body {
+    background-color: #f8f9fa;
+}
+
+#loginForm > *{
+    display:block;
+}
+p.error {
+    text-align: center;
+    color: #900;
+    font-weight: bold;
+}
+footer{
+    position: absolute !important;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+
+.btn-register{
+    background: #ffcb05 !important;
+    color:black;
+    float: right;
+    margin-right: 6%;
+}
